@@ -1,23 +1,9 @@
-import logo from './logo.svg';
-import './App.css';
-
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ padding: 40, fontFamily: "sans-serif" }}>
+      <h1>React + OneSignal</h1>
+      <p>Push notifications are enabled on this site.</p>
+      <p>Click “Allow” when prompted to receive updates.</p>
     </div>
   );
 }
