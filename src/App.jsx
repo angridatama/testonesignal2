@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import '../dist/styles.css';
+import 'styles.css';
 
 function App() {
   const [isReady, setIsReady] = useState(false);
