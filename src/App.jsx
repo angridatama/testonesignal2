@@ -4,7 +4,7 @@ function App() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Defer OneSignal setup until SDK loads
+  if (window.OneSignal) {
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     window.OneSignalDeferred.push(async function (OneSignal) {
       await OneSignal.init({
@@ -13,7 +13,7 @@ function App() {
         serviceWorkerUpdaterPath: "OneSignalSDKUpdaterWorker.js",
         serviceWorkerParam: { scope: "/" },
         autoResubscribe: true,
-        autoRegister: false // Prevent automatic prompt
+        autoRegister: false, // Prevent automatic prompt
       });
 
       setIsReady(true);
@@ -23,7 +23,9 @@ function App() {
         console.log('User state changed:', event);
       });
     });
-  }, []);
+  }
+}, []);
+
 
   const handlePrompt = async () => {
     try {
