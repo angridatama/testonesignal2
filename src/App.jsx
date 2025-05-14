@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import './styles.css';
+import Lottie from 'lottie-web';
 
 function App() {
   const [isReady, setIsReady] = useState(false);
-  const [onesignalId, setOneSignalId] = useState(null);
+  const [onesignalId, setOnesignalId] = useState(null);
 
   useEffect(() => {
     window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -17,25 +18,30 @@ function App() {
         autoRegister: false,
       });
 
+      // Permission prompt display event
       OneSignal.Notifications.addEventListener("permissionPromptDisplay", () => {
         console.log("Permission prompt displayed.");
       });
 
+      // Permission change event
       OneSignal.Notifications.addEventListener("permissionChange", (granted) => {
         console.log("Permission changed:", granted);
       });
 
+      // Notification click event
       OneSignal.Notifications.addEventListener("click", (event) => {
         console.log("Notification clicked:", event);
       });
 
+      // Push subscription change event
       OneSignal.User.PushSubscription.addEventListener("change", async (event) => {
         if (event.current?.token) {
           console.log("Push token received!");
           const onesignalId = event.current.id;
           console.log("OneSignal ID:", onesignalId);
-          setOneSignalId(onesignalId);
+          setOnesignalId(onesignalId); // Update state with OneSignal ID
 
+          // Send to Glide
           try {
             const response = await fetch(
               "https://go.glideapps.com/api/container/plugin/webhook-trigger/nyEQtv7S4N1E2SfxTuax/80a82896-f99a-40e0-a71c-c35eeb5f11a2",
@@ -53,7 +59,7 @@ function App() {
               const text = await response.text();
               console.error("Failed to send to Glide:", text);
             } else {
-              console.log("Sent to Glide");
+              alert("Sent OneSignal ID to Glide!");
             }
           } catch (err) {
             console.error("Error sending ID to Glide:", err);
@@ -65,19 +71,34 @@ function App() {
     });
   }, []);
 
+  // Initialize Lottie animation after the component mounts
+  useEffect(() => {
+    if (isReady) {
+      // Create the Lottie animation
+      Lottie.loadAnimation({
+        container: document.querySelector("#lottie-container"),
+        animationData: require("./animations/animation.json"), // Add path to your Lottie JSON animation file
+        renderer: "svg",
+        loop: true,
+        autoplay: true
+      });
+    }
+  }, [isReady]);
+
   return (
     <div className="App">
-      <h1>▚ OneSignal Terminal ▞</h1>
-      <div className="status-box">
-        {onesignalId ? (
-          <>
-            <p className="label">✅ OneSignal ID</p>
-            <p className="id">{onesignalId}</p>
-          </>
-        ) : (
-          <p className="waiting">⌛ Waiting for push permission...</p>
-        )}
-      </div>
+      <h1>OneSignal + Glide Integration</h1>
+
+      {/* Lottie animation container */}
+      <div id="lottie-container" style={{ width: 200, height: 200 }}></div>
+
+      {/* Show OneSignal ID if available */}
+      {onesignalId && (
+        <div className="status-box">
+          <div className="label">OneSignal ID:</div>
+          <div className="id">{onesignalId}</div>
+        </div>
+      )}
     </div>
   );
 }
