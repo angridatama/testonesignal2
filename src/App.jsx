@@ -81,7 +81,7 @@ function App() {
       // Create the Lottie animation
       Lottie.loadAnimation({
         container: document.querySelector("#lottie-container"),
-        animationData: require("./path/to/your/animation.json"), // Add path to your Lottie JSON animation file
+        animationData: require("./animation/animation.json"), // Add path to your Lottie JSON animation file
         renderer: "svg",
         loop: true,
         autoplay: true
