@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import '../dist/styles.css';
 
 function App() {
   const [isReady, setIsReady] = useState(false);
@@ -86,11 +87,7 @@ function App() {
   return (
     <div className="App">
       <h1>OneSignal + Glide Integration</h1>
-      {isReady ? (
-        <button onClick={handlePrompt}>Enable Push Notifications</button>
-      ) : (
-        <p>Loading OneSignal...</p>
-      )}
+      
     </div>
   );
 }
