@@ -108,6 +108,7 @@ function App() {
 
   return (
     <div className="App">
+      <div id="lottie-container" style={{ width: 200, height: 200 }}></div>
       <h1>OneSignal + Glide Integration</h1>
 
       {/* Marquee text that shows until user clicks the prompt or user ID exists */}
@@ -116,9 +117,6 @@ function App() {
           <marquee behavior="scroll" direction="left">Please wait for the prompt to show up, and click the prompt if it shows up!</marquee>
         </div>
       )}
-
-      {/* Lottie animation container */}
-      <div id="lottie-container" style={{ width: 200, height: 200 }}></div>
 
       {/* Show OneSignal ID if available */}
       {onesignalId && (
