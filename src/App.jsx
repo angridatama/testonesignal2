@@ -1,60 +1,58 @@
-import { useEffect } from "react";
-import OneSignal from "react-onesignal";
-
-const userEmail = "user@example.com"; // Replace with dynamic email if available
+import { useEffect } from 'react';
+import OneSignal from 'react-onesignal';
 
 function App() {
   useEffect(() => {
-    async function initializeOneSignal() {
+    async function initOneSignal() {
       try {
         await OneSignal.init({
           appId: "fcf28885-6e95-4401-8235-e8223ab2e898",
-          notifyButton: {
-            enable: true,
-          },
-          allowLocalhostAsSecureOrigin: true,
+          serviceWorkerPath: 'OneSignalSDKWorker.js',
+          serviceWorkerUpdaterPath: 'OneSignalSDKUpdaterWorker.js',
+          serviceWorkerParam: { scope: '/' },
         });
 
-        // Wait briefly before checking subscription
-        setTimeout(async () => {
-          try {
-            const userId = await OneSignal.User.PushSubscription.getId();
+        await OneSignal.showSlidedownPrompt();
 
-            if (userId) {
-              console.log("OneSignal User ID:", userId);
+        const onesignalUserId = await OneSignal.User.getId();
+        console.log('OneSignal User ID:', onesignalUserId);
 
-              // Send to Glide
-              await fetch("https://go.glideapps.com/api/container/plugin/webhook-trigger/nyEQtv7S4N1E2SfxTuax/80a82896-f99a-40e0-a71c-c35eeb5f11a2", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": "Bearer fda014a4-0721-45b2-a1d8-4691500ae2da",
-                },
-                body: JSON.stringify({ email: userEmail, userId }),
-              });
+        if (!onesignalUserId) {
+          console.error("Failed to get OneSignal User ID");
+          return;
+        }
 
-              console.log("User ID sent to Glide.");
-            } else {
-              console.log("User has not accepted push notifications yet.");
-            }
-          } catch (err) {
-            console.error("Failed to get OneSignal User ID or send to Glide:", err);
+        const response = await fetch(
+          "https://go.glideapps.com/api/container/plugin/webhook-trigger/nyEQtv7S4N1E2SfxTuax/80a82896-f99a-40e0-a71c-c35eeb5f11a2",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer fda014a4-0721-45b2-a1d8-4691500ae2da",
+            },
+            body: JSON.stringify({
+              onesignalUserId: onesignalUserId,
+            }),
           }
-        }, 3000); // wait 3 seconds for user interaction
-      } catch (err) {
-        console.error("OneSignal SDK failed to initialize:", err);
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Failed to send to Glide:", errorText);
+        } else {
+          console.log("Successfully sent to Glide");
+        }
+      } catch (error) {
+        console.error("Error during OneSignal setup or sending to Glide:", error);
       }
     }
 
-    if (typeof window !== "undefined") {
-      initializeOneSignal();
-    }
+    initOneSignal();
   }, []);
 
   return (
-    <div>
+    <div className="App">
       <h1>OneSignal + Glide Integration</h1>
-      <p>Push notification prompt should appear.</p>
     </div>
   );
 }
