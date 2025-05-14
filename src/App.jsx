@@ -10,13 +10,18 @@ function App() {
 
   // Get email from URL on first load
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const emailParam = params.get("email");
-    if (emailParam) {
-      setEmail(emailParam);
-      console.log("Email from URL:", emailParam);
-    }
-  }, []);
+  const search = window.location.search;
+  const params = new URLSearchParams(search);
+  const emailParam = params.get("email");
+
+  if (emailParam) {
+    const decodedEmail = decodeURIComponent(emailParam);
+    console.log("Extracted email:", decodedEmail);
+    setEmail(decodedEmail);
+  } else {
+    console.warn("No email found in URL");
+  }
+}, []);
 
   useEffect(() => {
     window.OneSignalDeferred = window.OneSignalDeferred || [];
