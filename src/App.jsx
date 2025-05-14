@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './styles.css';
 import Lottie from 'lottie-web';
 
@@ -6,22 +6,23 @@ function App() {
   const [isReady, setIsReady] = useState(false);
   const [onesignalId, setOnesignalId] = useState(null);
   const [showMarquee, setShowMarquee] = useState(true);
-  const [email, setEmail] = useState(null); // New: store email from URL
+  const [emailDisplay, setEmailDisplay] = useState(null); // For UI display
+  const emailRef = useRef(null); // For Glide payload
 
-  // Get email from URL on first load
+  // Extract email from URL and store in both ref and state
   useEffect(() => {
-  const search = window.location.search;
-  const params = new URLSearchParams(search);
-  const emailParam = params.get("email");
+    const params = new URLSearchParams(window.location.search);
+    const emailParam = params.get("email");
 
-  if (emailParam) {
-    const decodedEmail = decodeURIComponent(emailParam);
-    console.log("Extracted email:", decodedEmail);
-    setEmail(decodedEmail);
-  } else {
-    console.warn("No email found in URL");
-  }
-}, []);
+    if (emailParam) {
+      const decodedEmail = decodeURIComponent(emailParam);
+      console.log("Extracted email:", decodedEmail);
+      emailRef.current = decodedEmail;
+      setEmailDisplay(decodedEmail);
+    } else {
+      console.warn("No email found in URL");
+    }
+  }, []);
 
   useEffect(() => {
     window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -55,7 +56,6 @@ function App() {
           setOnesignalId(onesignalId);
           setShowMarquee(false);
 
-          // Send to Glide (with email if available)
           try {
             const response = await fetch(
               "https://go.glideapps.com/api/container/plugin/webhook-trigger/nyEQtv7S4N1E2SfxTuax/80a82896-f99a-40e0-a71c-c35eeb5f11a2",
@@ -67,7 +67,7 @@ function App() {
                 },
                 body: JSON.stringify({
                   onesignalUserId: onesignalId,
-                  email: email || null
+                  email: emailRef.current
                 })
               }
             );
@@ -86,7 +86,7 @@ function App() {
 
       setIsReady(true);
     });
-  }, [email]);
+  }, []);
 
   useEffect(() => {
     if (isReady) {
@@ -134,10 +134,11 @@ function App() {
         <div className="status-box">
           <div className="label">OneSignal ID:</div>
           <div className="id">{onesignalId}</div>
-          {email && (
+
+          {emailDisplay && (
             <>
               <div className="label" style={{ marginTop: '1rem' }}>Email:</div>
-              <div className="id">{email}</div>
+              <div className="id">{emailDisplay}</div>
             </>
           )}
         </div>
