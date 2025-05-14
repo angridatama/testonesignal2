@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import OneSignal from "react-onesignal";
 
-const userEmail = "user@example.com"; // Replace with actual user email
+const userEmail = "user@example.com"; // Replace with dynamic email if available
 
 function App() {
   useEffect(() => {
@@ -15,14 +15,15 @@ function App() {
           allowLocalhostAsSecureOrigin: true,
         });
 
-        // Wait a little bit before trying to get the user ID
+        // Wait briefly before checking subscription
         setTimeout(async () => {
           try {
-            const userId = await OneSignal.getUserId();
+            const userId = await OneSignal.User.PushSubscription.getId();
+
             if (userId) {
               console.log("OneSignal User ID:", userId);
 
-              // Send to Glide webhook
+              // Send to Glide
               await fetch("https://go.glideapps.com/api/container/plugin/webhook-trigger/nyEQtv7S4N1E2SfxTuax/80a82896-f99a-40e0-a71c-c35eeb5f11a2", {
                 method: "POST",
                 headers: {
@@ -36,12 +37,12 @@ function App() {
             } else {
               console.log("User has not accepted push notifications yet.");
             }
-          } catch (error) {
-            console.error("Failed to get OneSignal User ID or send to Glide:", error);
+          } catch (err) {
+            console.error("Failed to get OneSignal User ID or send to Glide:", err);
           }
-        }, 3000); // 3-second delay to wait for user interaction
-      } catch (error) {
-        console.error("OneSignal SDK failed to initialize:", error);
+        }, 3000); // wait 3 seconds for user interaction
+      } catch (err) {
+        console.error("OneSignal SDK failed to initialize:", err);
       }
     }
 
@@ -53,7 +54,7 @@ function App() {
   return (
     <div>
       <h1>OneSignal + Glide Integration</h1>
-      <p>Push prompt should show up automatically.</p>
+      <p>Push notification prompt should appear.</p>
     </div>
   );
 }
