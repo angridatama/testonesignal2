@@ -87,7 +87,6 @@ function App() {
   return (
     <div className="App">
       <h1>OneSignal + Glide Integration</h1>
-      
     </div>
   );
 }
