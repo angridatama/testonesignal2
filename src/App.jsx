@@ -5,6 +5,7 @@ import Lottie from 'lottie-web';
 function App() {
   const [isReady, setIsReady] = useState(false);
   const [onesignalId, setOnesignalId] = useState(null);
+  const [showMarquee, setShowMarquee] = useState(true); // state for controlling marquee visibility
 
   useEffect(() => {
     window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -21,6 +22,8 @@ function App() {
       // Permission prompt display event
       OneSignal.Notifications.addEventListener("permissionPromptDisplay", () => {
         console.log("Permission prompt displayed.");
+        // Hide marquee when prompt is displayed
+        setShowMarquee(false);
       });
 
       // Permission change event
@@ -40,6 +43,7 @@ function App() {
           const onesignalId = event.current.id;
           console.log("OneSignal ID:", onesignalId);
           setOnesignalId(onesignalId); // Update state with OneSignal ID
+          setShowMarquee(false); // Hide marquee when user ID is received
 
           // Send to Glide
           try {
@@ -77,7 +81,7 @@ function App() {
       // Create the Lottie animation
       Lottie.loadAnimation({
         container: document.querySelector("#lottie-container"),
-        animationData: require("./animation/animation.json"), // Add path to your Lottie JSON animation file
+        animationData: require("./path/to/your/animation.json"), // Add path to your Lottie JSON animation file
         renderer: "svg",
         loop: true,
         autoplay: true
@@ -85,9 +89,33 @@ function App() {
     }
   }, [isReady]);
 
+  const handlePrompt = async () => {
+    try {
+      await window.OneSignal.Slidedown.promptPush({ force: true });
+
+      const state = await window.OneSignal.User.PushSubscription.get();
+      console.log("Push subscription state:", state);
+
+      if (!state.optedIn) {
+        alert("You need to allow notifications to continue.");
+      }
+
+      setShowMarquee(false); // Hide marquee after the user clicks the prompt
+    } catch (err) {
+      console.error("Prompt error:", err);
+    }
+  };
+
   return (
     <div className="App">
       <h1>OneSignal + Glide Integration</h1>
+
+      {/* Marquee text that shows until user clicks the prompt or user ID exists */}
+      {showMarquee && (
+        <div className="marquee-container">
+          <marquee behavior="scroll" direction="left">Please wait for the prompt to show up, and click the prompt if it shows up!</marquee>
+        </div>
+      )}
 
       {/* Lottie animation container */}
       <div id="lottie-container" style={{ width: 200, height: 200 }}></div>
