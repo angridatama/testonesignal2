@@ -15,32 +15,31 @@ function App() {
           allowLocalhostAsSecureOrigin: true,
         });
 
-        // Wait for subscription to be complete
-        const isPushSupported = await OneSignal.isPushNotificationsSupported();
-        if (!isPushSupported) {
-          console.warn("Push not supported");
-          return;
-        }
+        // Wait a little bit before trying to get the user ID
+        setTimeout(async () => {
+          try {
+            const userId = await OneSignal.getUserId();
+            if (userId) {
+              console.log("OneSignal User ID:", userId);
 
-        const isSubscribed = await OneSignal.isPushNotificationsEnabled();
-        if (isSubscribed) {
-          const userId = await OneSignal.getUserId();
+              // Send to Glide webhook
+              await fetch("https://go.glideapps.com/api/container/plugin/webhook-trigger/nyEQtv7S4N1E2SfxTuax/80a82896-f99a-40e0-a71c-c35eeb5f11a2", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": "Bearer fda014a4-0721-45b2-a1d8-4691500ae2da",
+                },
+                body: JSON.stringify({ email: userEmail, userId }),
+              });
 
-          console.log("OneSignal User ID:", userId);
-
-          // Send to Glide webhook
-          fetch("https://go.glideapps.com/api/container/plugin/webhook-trigger/nyEQtv7S4N1E2SfxTuax/80a82896-f99a-40e0-a71c-c35eeb5f11a2", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer fda014a4-0721-45b2-a1d8-4691500ae2da",
-            },
-            body: JSON.stringify({ email: userEmail, userId }),
-          }).then(res => console.log("Sent to Glide:", res.status))
-            .catch(err => console.error("Error sending to Glide:", err));
-        } else {
-          console.log("User has not subscribed yet.");
-        }
+              console.log("User ID sent to Glide.");
+            } else {
+              console.log("User has not accepted push notifications yet.");
+            }
+          } catch (error) {
+            console.error("Failed to get OneSignal User ID or send to Glide:", error);
+          }
+        }, 3000); // 3-second delay to wait for user interaction
       } catch (error) {
         console.error("OneSignal SDK failed to initialize:", error);
       }
