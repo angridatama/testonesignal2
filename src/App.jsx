@@ -13,22 +13,22 @@ function App() {
           serviceWorkerUpdaterPath: "OneSignalSDKUpdaterWorker.js",
           serviceWorkerParam: { scope: "/" },
           autoResubscribe: true,
-          autoRegister: false, // You control when to prompt
+          autoRegister: false, // Manual prompt
         });
 
-        // Event: permission prompt is displayed
+        // Event: when permission prompt shows
         OneSignal.Notifications.addEventListener("permissionPromptDisplay", () => {
           console.log("Permission prompt displayed.");
         });
 
-        // Event: permission changed (allow/block/dismiss)
+        // Event: when permission is changed (allowed/blocked/dismissed)
         OneSignal.Notifications.addEventListener("permissionChange", (permission) => {
           console.log(`Permission changed: ${permission ? "granted" : "denied"}`);
         });
 
-        // Event: notification clicked
+        // Event: notification click
         OneSignal.Notifications.addEventListener("click", (event) => {
-          console.log("Notification click event:", event);
+          console.log("Notification clicked:", event);
         });
 
         setIsReady(true);
@@ -38,28 +38,37 @@ function App() {
 
   const handlePrompt = async () => {
     try {
-      // Show the OneSignal slidedown prompt with force (UI-bound click)
+      // Show permission prompt
       await window.OneSignal.Slidedown.promptPush({ force: true });
 
-      // Wait a moment for permission to settle
-      const permission = await window.OneSignal.Notifications.permission;
+      const isPushEnabled = await window.OneSignal.Notifications.isPushEnabled();
+      console.log("Push Enabled:", isPushEnabled);
 
-      console.log("Notification permission status:", permission);
-
-      if (permission !== 'granted') {
-        alert("Permission not granted. Please allow notifications.");
+      if (!isPushEnabled) {
+        alert("You need to allow notifications to continue.");
         return;
       }
 
-      const onesignalId = await window.OneSignal.User.onesignalId;
+      // Retry getting OneSignal ID
+      const waitForUserId = async () => {
+        let tries = 0;
+        while (tries < 10) {
+          const id = await window.OneSignal.User.onesignalId;
+          if (id) return id;
+          await new Promise(res => setTimeout(res, 500));
+          tries++;
+        }
+        return null;
+      };
+
+      const onesignalId = await waitForUserId();
       console.log("OneSignal ID:", onesignalId);
 
       if (!onesignalId) {
-        console.error("Failed to retrieve OneSignal ID.");
+        console.error("Failed to get OneSignal user ID.");
         return;
       }
 
-      // Send ID to Glide
       const response = await fetch(
         "https://go.glideapps.com/api/container/plugin/webhook-trigger/nyEQtv7S4N1E2SfxTuax/80a82896-f99a-40e0-a71c-c35eeb5f11a2",
         {
@@ -74,12 +83,12 @@ function App() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Error sending to Glide:", errorText);
+        console.error("Failed to send to Glide:", errorText);
       } else {
-        alert("Successfully sent OneSignal ID to Glide!");
+        alert("Sent OneSignal ID to Glide!");
       }
-    } catch (error) {
-      console.error("Unexpected error during prompt:", error);
+    } catch (err) {
+      console.error("Prompt error:", err);
     }
   };
 
