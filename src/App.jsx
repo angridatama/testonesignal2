@@ -5,7 +5,18 @@ import Lottie from 'lottie-web';
 function App() {
   const [isReady, setIsReady] = useState(false);
   const [onesignalId, setOnesignalId] = useState(null);
-  const [showMarquee, setShowMarquee] = useState(true); // state for controlling marquee visibility
+  const [showMarquee, setShowMarquee] = useState(true);
+  const [email, setEmail] = useState(null); // New: store email from URL
+
+  // Get email from URL on first load
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const emailParam = params.get("email");
+    if (emailParam) {
+      setEmail(emailParam);
+      console.log("Email from URL:", emailParam);
+    }
+  }, []);
 
   useEffect(() => {
     window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -19,33 +30,27 @@ function App() {
         autoRegister: false,
       });
 
-      // Permission prompt display event
       OneSignal.Notifications.addEventListener("permissionPromptDisplay", () => {
         console.log("Permission prompt displayed.");
-        // Hide marquee when prompt is displayed
         setShowMarquee(false);
       });
 
-      // Permission change event
       OneSignal.Notifications.addEventListener("permissionChange", (granted) => {
         console.log("Permission changed:", granted);
       });
 
-      // Notification click event
       OneSignal.Notifications.addEventListener("click", (event) => {
         console.log("Notification clicked:", event);
       });
 
-      // Push subscription change event
       OneSignal.User.PushSubscription.addEventListener("change", async (event) => {
         if (event.current?.token) {
           console.log("Push token received!");
           const onesignalId = event.current.id;
-          console.log("OneSignal ID:", onesignalId);
-          setOnesignalId(onesignalId); // Update state with OneSignal ID
-          setShowMarquee(false); // Hide marquee when user ID is received
+          setOnesignalId(onesignalId);
+          setShowMarquee(false);
 
-          // Send to Glide
+          // Send to Glide (with email if available)
           try {
             const response = await fetch(
               "https://go.glideapps.com/api/container/plugin/webhook-trigger/nyEQtv7S4N1E2SfxTuax/80a82896-f99a-40e0-a71c-c35eeb5f11a2",
@@ -55,7 +60,10 @@ function App() {
                   "Content-Type": "application/json",
                   "Authorization": "Bearer fda014a4-0721-45b2-a1d8-4691500ae2da"
                 },
-                body: JSON.stringify({ onesignalUserId: onesignalId })
+                body: JSON.stringify({
+                  onesignalUserId: onesignalId,
+                  email: email || null
+                })
               }
             );
 
@@ -63,25 +71,23 @@ function App() {
               const text = await response.text();
               console.error("Failed to send to Glide:", text);
             } else {
-              alert("Sent OneSignal ID to Glide!");
+              alert("Sent OneSignal ID and email to Glide!");
             }
           } catch (err) {
-            console.error("Error sending ID to Glide:", err);
+            console.error("Error sending data to Glide:", err);
           }
         }
       });
 
       setIsReady(true);
     });
-  }, []);
+  }, [email]);
 
-  // Initialize Lottie animation after the component mounts
   useEffect(() => {
     if (isReady) {
-      // Create the Lottie animation
       Lottie.loadAnimation({
         container: document.querySelector("#lottie-container"),
-        animationData: require("./animation/animation.json"), // Add path to your Lottie JSON animation file
+        animationData: require("./animation/animation.json"),
         renderer: "svg",
         loop: true,
         autoplay: true
@@ -100,7 +106,7 @@ function App() {
         alert("You need to allow notifications to continue.");
       }
 
-      setShowMarquee(false); // Hide marquee after the user clicks the prompt
+      setShowMarquee(false);
     } catch (err) {
       console.error("Prompt error:", err);
     }
@@ -111,18 +117,24 @@ function App() {
       <div id="lottie-container" style={{ width: 200, height: 200 }}></div>
       <h1>OneSignal + Glide Integration</h1>
 
-      {/* Marquee text that shows until user clicks the prompt or user ID exists */}
       {showMarquee && (
         <div className="marquee-container">
-          <marquee behavior="scroll" direction="left">Please wait for the prompt to show up, and click the prompt if it shows up!</marquee>
+          <marquee behavior="scroll" direction="left">
+            Please wait for the prompt to show up, and click the prompt if it shows up!
+          </marquee>
         </div>
       )}
 
-      {/* Show OneSignal ID if available */}
       {onesignalId && (
         <div className="status-box">
           <div className="label">OneSignal ID:</div>
           <div className="id">{onesignalId}</div>
+          {email && (
+            <>
+              <div className="label" style={{ marginTop: '1rem' }}>Email:</div>
+              <div className="id">{email}</div>
+            </>
+          )}
         </div>
       )}
     </div>
