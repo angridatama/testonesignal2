@@ -6,85 +6,86 @@ function App() {
   const [isReady, setIsReady] = useState(false);
   const [onesignalId, setOnesignalId] = useState(null);
   const [showMarquee, setShowMarquee] = useState(true);
-  const [emailDisplay, setEmailDisplay] = useState(null); // For UI display
-  const emailRef = useRef(null); // For Glide payload
+  const [emailDisplay, setEmailDisplay] = useState(null);
+  const emailRef = useRef(null);
 
-  // Extract email from URL and store in both ref and state
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const emailParam = params.get("email");
 
     if (emailParam) {
       const decodedEmail = decodeURIComponent(emailParam);
-      console.log("Extracted email:", decodedEmail);
       emailRef.current = decodedEmail;
       setEmailDisplay(decodedEmail);
     } else {
-      console.warn("No email found in URL");
+      alert("⚠️ No email found in URL");
     }
   }, []);
 
   useEffect(() => {
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     window.OneSignalDeferred.push(async function (OneSignal) {
-      await OneSignal.init({
-        appId: "fcf28885-6e95-4401-8235-e8223ab2e898",
-        serviceWorkerPath: "OneSignalSDKWorker.js",
-        serviceWorkerUpdaterPath: "OneSignalSDKUpdaterWorker.js",
-        serviceWorkerParam: { scope: "/" },
-        autoResubscribe: true,
-        autoRegister: false,
-      });
+      try {
+        await OneSignal.init({
+          appId: "Your Onesignal app ID",
+          serviceWorkerPath: "OneSignalSDKWorker.js",
+          serviceWorkerUpdaterPath: "OneSignalSDKUpdaterWorker.js",
+          serviceWorkerParam: { scope: "/" },
+          autoResubscribe: true,
+          autoRegister: false,
+        });
 
-      OneSignal.Notifications.addEventListener("permissionPromptDisplay", () => {
-        console.log("Permission prompt displayed.");
-        setShowMarquee(false);
-      });
-
-      OneSignal.Notifications.addEventListener("permissionChange", (granted) => {
-        console.log("Permission changed:", granted);
-      });
-
-      OneSignal.Notifications.addEventListener("click", (event) => {
-        console.log("Notification clicked:", event);
-      });
-
-      OneSignal.User.PushSubscription.addEventListener("change", async (event) => {
-        if (event.current?.token) {
-          console.log("Push token received!");
-          const onesignalId = event.current.id;
-          setOnesignalId(onesignalId);
+        OneSignal.Notifications.addEventListener("permissionPromptDisplay", () => {
+          alert("📢 Notification permission prompt displayed.");
           setShowMarquee(false);
+        });
 
-          try {
-            const response = await fetch(
-              "https://go.glideapps.com/api/container/plugin/webhook-trigger/nyEQtv7S4N1E2SfxTuax/80a82896-f99a-40e0-a71c-c35eeb5f11a2",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": "Bearer fda014a4-0721-45b2-a1d8-4691500ae2da"
-                },
-                body: JSON.stringify({
-                  onesignalUserId: onesignalId,
-                  email: emailRef.current
-                })
+        OneSignal.Notifications.addEventListener("permissionChange", (granted) => {
+          alert(`🔄 Notification permission changed: ${granted}`);
+        });
+
+        OneSignal.Notifications.addEventListener("click", (event) => {
+          alert("🔔 Notification clicked.");
+        });
+
+        OneSignal.User.PushSubscription.addEventListener("change", async (event) => {
+          if (event.current?.token) {
+            const onesignalId = event.current.id;
+            setOnesignalId(onesignalId);
+            setShowMarquee(false);
+
+            try {
+              const response = await fetch(
+                "https://go.glideapps.com/api/container/plugin/webhook-trigger/nyEQtv7S4N1E2SfxTuax/80a82896-f99a-40e0-a71c-c35eeb5f11a2",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer fda014a4-0721-45b2-a1d8-4691500ae2da"
+                  },
+                  body: JSON.stringify({
+                    onesignalUserId: onesignalId,
+                    email: emailRef.current
+                  })
+                }
+              );
+
+              if (!response.ok) {
+                const text = await response.text();
+                alert("❌ Failed to send to Glide: " + text);
+              } else {
+                alert("✅ Sent OneSignal ID and email to Glide!");
               }
-            );
-
-            if (!response.ok) {
-              const text = await response.text();
-              console.error("Failed to send to Glide:", text);
-            } else {
-              alert("Sent OneSignal ID and email to Glide!");
+            } catch (err) {
+              alert("❌ Error sending data to Glide: " + err.message);
             }
-          } catch (err) {
-            console.error("Error sending data to Glide:", err);
           }
-        }
-      });
+        });
 
-      setIsReady(true);
+        setIsReady(true);
+      } catch (err) {
+        alert("🚫 OneSignal init error: " + err.message);
+      }
     });
   }, []);
 
@@ -105,17 +106,26 @@ function App() {
       await window.OneSignal.Slidedown.promptPush({ force: true });
 
       const state = await window.OneSignal.User.PushSubscription.get();
-      console.log("Push subscription state:", state);
-
       if (!state.optedIn) {
-        alert("You need to allow notifications to continue.");
+        alert("🚨 You need to allow notifications to continue.");
       }
 
       setShowMarquee(false);
     } catch (err) {
-      console.error("Prompt error:", err);
+      alert("❌ Prompt error: " + err.message);
     }
   };
+
+  const openGlideAppLink = (
+    <a
+      href="https://onesignal-testing-aqr2.glide.page/dl/17171d"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="glide-app-button"
+    >
+      Open the app again
+    </a>
+  );
 
   return (
     <div className="App">
@@ -127,6 +137,9 @@ function App() {
           <marquee behavior="scroll" direction="left">
             Please wait for the prompt to show up, and click the prompt if it shows up!
           </marquee>
+          <div style={{ marginTop: '1rem' }}>
+            {openGlideAppLink}
+          </div>
         </div>
       )}
 
@@ -139,6 +152,9 @@ function App() {
             <>
               <div className="label" style={{ marginTop: '1rem' }}>Email:</div>
               <div className="id">{emailDisplay}</div>
+              <div style={{ marginTop: '1.5rem' }}>
+                {openGlideAppLink}
+              </div>
             </>
           )}
         </div>
