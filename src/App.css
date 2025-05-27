@@ -91,22 +91,23 @@ h1 {
 }
 
 .glide-app-button {
-  display: inline-block;
   background-color: #000;
   color: #00ff00;
-  padding: 10px 25px;
-  border-radius: 25px;
-  text-decoration: none;
+  padding: 12px 24px;
+  border-radius: 30px;
   font-family: 'VT323', monospace;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
+  text-decoration: none;
   border: 2px solid #00ff00;
   text-align: center;
   box-shadow: 0 0 10px #00ff00;
-  margin: 0 auto;
+  transition: all 0.2s ease;
+  display: inline-block;
 }
-
 
 .glide-app-button:hover {
-  background-color: #0056b3;
+  background-color: #111;
+  box-shadow: 0 0 20px #00ff00;
 }
+
 
