@@ -131,6 +131,7 @@ function App() {
               href="https://onesignal-testing-aqr2.glide.page/dl/17171d"
               target="_blank"
               rel="noopener noreferrer" 
+              className="glide-app-button"
             >
               Open the app again
             </a>
@@ -147,11 +148,12 @@ function App() {
             <>
               <div className="label" style={{ marginTop: '1rem' }}>Email:</div>
               <div className="id">{emailDisplay}</div>
-              <div className="glide-app-button">
+              <div >
                 <a
                   href="https://onesignal-testing-aqr2.glide.page/dl/17171d"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="glide-app-button"
                 >
                   Open the app again
                 </a>

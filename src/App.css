@@ -68,27 +68,6 @@ h1 {
   text-align: center;
 }
 
-/* Responsive tweaks */
-@media (max-width: 480px) {
-  .App {
-    padding: 1rem;
-    border-width: 2px;
-  }
-
-  h1 {
-    font-size: 1.5rem;
-    padding-bottom: 0.5rem;
-  }
-
-  .label {
-    font-size: 1.2rem;
-  }
-
-  .id {
-    font-size: 0.9rem;
-    padding: 0.8rem;
-  }
-}
 
 .glide-app-button {
   background-color: #000;
@@ -111,5 +90,28 @@ h1 {
   background-color: #111;
   box-shadow: 0 0 20px #00ff00;
 }
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  .App {
+    padding: 1rem;
+    border-width: 2px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .label {
+    font-size: 1.2rem;
+  }
+
+  .id {
+    font-size: 0.9rem;
+    padding: 0.8rem;
+  }
+}
+
 
 
