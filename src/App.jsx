@@ -116,17 +116,6 @@ function App() {
     }
   };
 
-  const openGlideAppLink = (
-    <a
-      href="https://onesignal-testing-aqr2.glide.page/dl/17171d"
-      target="_blank"
-      rel="noopener noreferrer"
-      
-    >
-      Open the app again
-    </a>
-  );
-
   return (
     <div className="App">
       <div id="lottie-container" style={{ width: 200, height: 200 }}></div>
@@ -138,7 +127,13 @@ function App() {
             Please wait for the prompt to show up, and click the prompt if it shows up!
           </marquee>
           <div className="glide-app-button">
-            {openGlideAppLink}
+            <a
+              href="https://onesignal-testing-aqr2.glide.page/dl/17171d"
+              target="_blank"
+              rel="noopener noreferrer" 
+            >
+              Open the app again
+            </a>
           </div>
         </div>
       )}
@@ -153,7 +148,13 @@ function App() {
               <div className="label" style={{ marginTop: '1rem' }}>Email:</div>
               <div className="id">{emailDisplay}</div>
               <div className="glide-app-button">
-                {openGlideAppLink}
+              <a
+                href="https://onesignal-testing-aqr2.glide.page/dl/17171d"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Open the app again
+              </a>
               </div>
             </>
           )}
