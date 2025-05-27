@@ -98,6 +98,7 @@ h1 {
 }
 
 .glide-app-button-container {
+  margin-top: 20px;
   width: 100%;
   text-align: center;
 }
