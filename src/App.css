@@ -102,7 +102,9 @@ h1 {
   text-align: center;
   box-shadow: 0 0 10px #00ff00;
   transition: all 0.2s ease;
-  display: inline-block;
+  display: flex;
+  margin-top: '1rem';
+  justify-content: center;
 }
 
 .glide-app-button:hover {

@@ -137,7 +137,7 @@ function App() {
           <marquee behavior="scroll" direction="left">
             Please wait for the prompt to show up, and click the prompt if it shows up!
           </marquee>
-          <div className="glide-app-button" style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+          <div>
             {openGlideAppLink}
           </div>
         </div>
@@ -152,7 +152,7 @@ function App() {
             <>
               <div className="label" style={{ marginTop: '1rem' }}>Email:</div>
               <div className="id">{emailDisplay}</div>
-              <div className="glide-app-button" style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+              <div>
                 {openGlideAppLink}
               </div>
             </>
