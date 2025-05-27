@@ -71,24 +71,29 @@ h1 {
 
 .glide-app-button {
   background-color: #000;
-  color: #00ff00;
+  color: #00ff00 !important; /* Force the green color */
   padding: 12px 24px;
   border-radius: 30px;
   font-family: 'VT323', monospace;
   font-size: 1.4rem;
-  text-decoration: none;
+  text-decoration: none !important; /* Remove underline */
   border: 2px solid #00ff00;
   text-align: center;
   box-shadow: 0 0 10px #00ff00;
   transition: all 0.2s ease;
-  display: flex;
-  margin-top: '1rem';
+  display: inline-block;
+  margin-top: 1rem;
   justify-content: center;
 }
 
 .glide-app-button:hover {
   background-color: #111;
   box-shadow: 0 0 20px #00ff00;
+}
+
+.glide-app-button-container {
+  width: 100%;
+  text-align: center;
 }
 
 /* Responsive tweaks */

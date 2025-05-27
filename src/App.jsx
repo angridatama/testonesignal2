@@ -126,16 +126,17 @@ function App() {
           <marquee behavior="scroll" direction="left">
             Please wait for the prompt to show up, and click the prompt if it shows up!
           </marquee>
-          <div className="glide-app-button">
+          <div className="glide-app-button-container">
             <a
               href="https://onesignal-testing-aqr2.glide.page/dl/17171d"
               target="_blank"
-              rel="noopener noreferrer" 
+              rel="noopener noreferrer"
               className="glide-app-button"
             >
               Open the app again
             </a>
           </div>
+
         </div>
       )}
 
@@ -148,7 +149,7 @@ function App() {
             <>
               <div className="label" style={{ marginTop: '1rem' }}>Email:</div>
               <div className="id">{emailDisplay}</div>
-              <div >
+               <div className="glide-app-button-container">
                 <a
                   href="https://onesignal-testing-aqr2.glide.page/dl/17171d"
                   target="_blank"
