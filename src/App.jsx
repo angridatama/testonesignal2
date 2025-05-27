@@ -152,9 +152,10 @@ function App() {
             <>
               <div className="label" style={{ marginTop: '1rem' }}>Email:</div>
               <div className="id">{emailDisplay}</div>
-              <div style={{ marginTop: '1.5rem' }}>
-                {openGlideAppLink}
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+                  {openGlideAppLink}
               </div>
+
             </>
           )}
         </div>
