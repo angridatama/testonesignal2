@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import './styles.css';
-import Lottie from 'lottie-web';
+import { useEffect, useRef, useState } from "react";
+import "./styles.css";
+import Lottie from "lottie-web";
 
 function App() {
   const [isReady, setIsReady] = useState(false);
@@ -35,52 +35,62 @@ function App() {
           autoRegister: false,
         });
 
-        OneSignal.Notifications.addEventListener("permissionPromptDisplay", () => {
-          alert("📢 Notification permission prompt displayed.");
-          setShowMarquee(false);
-        });
+        OneSignal.Notifications.addEventListener(
+          "permissionPromptDisplay",
+          () => {
+            alert("📢 Notification permission prompt displayed.");
+            setShowMarquee(false);
+          }
+        );
 
-        OneSignal.Notifications.addEventListener("permissionChange", (granted) => {
-          alert(`🔄 Notification permission changed: ${granted}`);
-        });
+        OneSignal.Notifications.addEventListener(
+          "permissionChange",
+          (granted) => {
+            alert(`🔄 Notification permission changed: ${granted}`);
+          }
+        );
 
         OneSignal.Notifications.addEventListener("click", (event) => {
           alert("🔔 Notification clicked.");
         });
 
-        OneSignal.User.PushSubscription.addEventListener("change", async (event) => {
-          if (event.current?.token) {
-            const onesignalId = event.current.id;
-            setOnesignalId(onesignalId);
-            setShowMarquee(false);
+        OneSignal.User.PushSubscription.addEventListener(
+          "change",
+          async (event) => {
+            if (event.current?.token) {
+              const onesignalId = event.current.id;
+              setOnesignalId(onesignalId);
+              setShowMarquee(false);
 
-            try {
-              const response = await fetch(
-                "https://go.glideapps.com/api/container/plugin/webhook-trigger/nyEQtv7S4N1E2SfxTuax/80a82896-f99a-40e0-a71c-c35eeb5f11a2",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer fda014a4-0721-45b2-a1d8-4691500ae2da"
-                  },
-                  body: JSON.stringify({
-                    onesignalUserId: onesignalId,
-                    email: emailRef.current
-                  })
+              try {
+                const response = await fetch(
+                  "https://go.glideapps.com/api/container/plugin/webhook-trigger/nyEQtv7S4N1E2SfxTuax/80a82896-f99a-40e0-a71c-c35eeb5f11a2",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization:
+                        "Bearer fda014a4-0721-45b2-a1d8-4691500ae2da",
+                    },
+                    body: JSON.stringify({
+                      onesignalUserId: onesignalId,
+                      email: emailRef.current,
+                    }),
+                  }
+                );
+
+                if (!response.ok) {
+                  const text = await response.text();
+                  alert("❌ Failed to send to Glide: " + text);
+                } else {
+                  alert("✅ Sent OneSignal ID and email to Glide!");
                 }
-              );
-
-              if (!response.ok) {
-                const text = await response.text();
-                alert("❌ Failed to send to Glide: " + text);
-              } else {
-                alert("✅ Sent OneSignal ID and email to Glide!");
+              } catch (err) {
+                alert("❌ Error sending data to Glide: " + err.message);
               }
-            } catch (err) {
-              alert("❌ Error sending data to Glide: " + err.message);
             }
           }
-        });
+        );
 
         setIsReady(true);
       } catch (err) {
@@ -96,7 +106,7 @@ function App() {
         animationData: require("./animation/animation.json"),
         renderer: "svg",
         loop: true,
-        autoplay: true
+        autoplay: true,
       });
     }
   }, [isReady]);
@@ -107,7 +117,7 @@ function App() {
 
       const state = await window.OneSignal.User.PushSubscription.get();
       if (!state.optedIn) {
-        alert("🚨 You need to allow notifications to continue.");
+        alert("⚠️ You need to allow notifications to continue.");
       }
 
       setShowMarquee(false);
@@ -124,7 +134,8 @@ function App() {
       {showMarquee && (
         <div className="marquee-container">
           <marquee behavior="scroll" direction="left">
-            Please wait for the prompt to show up, and click the prompt if it shows up!
+            Please wait for the prompt to show up, and click the prompt if it
+            shows up!
           </marquee>
         </div>
       )}
@@ -136,9 +147,10 @@ function App() {
 
           {emailDisplay && (
             <>
-              <div className="label" style={{ marginTop: '1rem' }}>Email:</div>
+              <div className="label" style={{ marginTop: "1rem" }}>
+                Email:
+              </div>
               <div className="id">{emailDisplay}</div>
-               
             </>
           )}
         </div>
